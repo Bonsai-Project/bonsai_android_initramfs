@@ -6,7 +6,7 @@ loglevel 1
 
 # Bonsai v4
 # setup the global environment
-	export PATH /system/sbin:/system/bin:/system/xbin:/sbin
+	export PATH /sbin:/system/sbin:/system/bin:/system/xbin
 	export LD_LIBRARY_PATH /system/lib:/system/lib/egl
 	export ANDROID_BOOTLOGO 1
 	export ANDROID_ROOT /system
@@ -42,6 +42,7 @@ loglevel 1
 	insmod /lib/modules/fsr_stl.ko
 	insmod /lib/modules/rfs_glue.ko
 	insmod /lib/modules/rfs_fat.ko
+	insmod /lib/modules/j4fs.ko
 	insmod /lib/modules/param.ko
 	insmod /lib/modules/dpram.ko
 
@@ -449,13 +450,17 @@ service playlogos1 /system/bin/playlogos1
 	user root
 	oneshot
 
+service init_local /sbin/init_wrapper
+	user root
+	oneshot
+
 # run user initscripts
 service initscripts /system/bin/logwrapper /system/xbin/busybox run-parts /system/etc/init.d
 	user root
 	oneshot
 
 # adbd is controlled by the persist.service.adb.enable system property
-service adbd /res/sbin/adbd
+service adbd /sbin/adbd
 	group shell log
 	disabled
 
