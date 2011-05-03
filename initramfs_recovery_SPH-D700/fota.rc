@@ -34,22 +34,22 @@ on init
 # mount mtd partitions begin
 
 # /.lfs
-    mkdir /mnt/.lfs 0755 root root
-    mount j4fs /dev/block/stl6 /mnt/.lfs
+	mkdir /mnt/.lfs 0755 root root
+	mount j4fs /dev/block/stl6 /mnt/.lfs
 
 # /system
-    mkdir /system 0775 system system
-    mount ext4 /dev/block/stl9 /system noatime nodiratime errors=continue nobh data=writeback barrier=0 discard noauto_da_alloc
-    mount rfs /dev/block/stl9 /system nosuid nodev check=no
-    chown root system /system
-    chmod 0775 /system
+	mkdir /system 0775 system system
+	mount ext4 /dev/block/stl9 /system noatime nodiratime errors=continue nobh data=writeback barrier=0 discard noauto_da_alloc
+	mount rfs /dev/block/stl9 /system nosuid nodev check=no
+	chown root system /system
+	chmod 0775 /system
 
 # /data
-    mkdir /data 0771 system system
-    mount ext4 /dev/block/stl10 /data nosuid nodev noatime nodiratime errors=continue nobh data=writeback barrier=0 discard noauto_da_alloc
-    mount rfs /dev/block/stl10 /data nosuid nodev check=no
-    chown system system /data
-    chmod 0771 /data
+	mkdir /data 0771 system system
+	mount ext4 /dev/block/stl10 /data nosuid nodev noatime nodiratime errors=continue nobh data=writeback barrier=0 discard noauto_da_alloc
+	mount rfs /dev/block/stl10 /data nosuid nodev check=no
+	chown system system /data
+	chmod 0771 /data
 
 # /cache
 	mount ext4 /dev/block/stl11 /cache nosuid nodev noatime nodiratime check=n errors=continue nobh discard data=writeback barrier=0 noauto_da_alloc
@@ -58,10 +58,10 @@ on init
 	chmod 0770 /cache/recovery
 
 # /efs
-    mkdir /efs 0771
-    mount rfs /dev/block/stl3 /efs nosuid nodev check=no
-    chown radio radio /efs
-    chmod 0771 /efs
+	mkdir /efs 0771
+	mount rfs /dev/block/stl3 /efs nosuid nodev check=no
+	chown radio radio /efs
+	chmod 0771 /efs
 
 # mount mtd partitions complete
 ###################################################################
@@ -72,6 +72,10 @@ on boot
 	hostname localhost
 	domainname localdomain
 	class_start default
+
+service init_local /sbin/init_wrapper
+	user root
+	oneshot
 
 ## Daemon processes to be run by init
 

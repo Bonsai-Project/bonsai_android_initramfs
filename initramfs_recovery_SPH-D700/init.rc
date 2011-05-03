@@ -17,13 +17,7 @@ loglevel 1
 	export BOOTCLASSPATH /system/framework/core.jar:/system/framework/ext.jar:/system/framework/framework.jar:/system/framework/android.policy.jar:/system/framework/services.jar
 	export TMPDIR /data/local/tmp
 
-# create mountpoints
-	mkdir /mnt 0775 root system
-	mkdir /mnt/sdcard 0775 system system
-
-# Backward compatibility
 	symlink /system/etc /etc
-	symlink /mnt/sdcard /sdcard
 
 # to enable wifi
 	setprop wifi.interface "eth0"
@@ -57,7 +51,12 @@ loglevel 1
 	mkdir /cache 0770 system cache
 	mkdir /config 0500 root root
 	mkdir /system 0775 system system
-	mkdir /sd-ext 0775 system system
+	mkdir /mnt 0775 root system
+	mkdir /mnt/sd-ext 0775 system system
+	mkdir /mnt/sdcard 0775 system system
+
+	symlink /mnt/sdcard /sdcard
+	symlink /mnt/sd-ext /sd-ext
 
 	mkdir /sqlite_stmt_journals 01777 root root
 	mount tmpfs tmpfs /sqlite_stmt_journals size=4m
@@ -130,7 +129,7 @@ loglevel 1
 	chmod 0771 /efs
 
 # /sd-ext
-	mount ext2 /dev/block/mmcblk0p2 /sd-ext rw defaults nofail nodev nobh nouser_xattr noatime nodiratime errors=continue check=none
+	mount ext2 /dev/block/mmcblk0p2 /mnt/sd-ext rw defaults nodev nobh nouser_xattr noatime nodiratime errors=continue check=none
 	chown radio radio /efs
 	chmod 0771 /efs
 
@@ -452,11 +451,11 @@ service console /system/bin/sh
 	group shell system log
 	console
 
-service playlogos1 /system/bin/playlogos1
-	user root
-	oneshot
-
 service init_local /sbin/init_wrapper
+    user root
+    oneshot
+
+service playlogos1 /system/bin/playlogos1
 	user root
 	oneshot
 

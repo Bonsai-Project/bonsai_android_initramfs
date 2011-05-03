@@ -8,19 +8,23 @@ $BB mount -o remount,rw /system
 $BB --install -s /sbin
 
 $BB chmod 6755 /sbin/su
-$BB rm -f /system/bin/su
-$BB rm -f /system/xbin/su
-$BB ln -s /sbin/su /system/bin/su
-$BB ln -s /sbin/su /system/xbin/su
-
-if [ ! -f "/system/etc/passwd" ]; then
-	echo "root::0:0:root:/data/local:/system/bin/sh" > /system/etc/passwd
-	$BB chmod 0666 /system/etc/passwd
+if $BB test -x /system/bin/su; then
+	$BB rm -f /system/bin/su
+	$BB ln -s /sbin/su /system/bin/su
+fi
+if $BB test -x /system/xbin/su; then
+	$BB rm -f /system/xbin/su
+	$BB ln -s /sbin/su /system/xbin/su
 fi
 
-if [ ! -f "/system/etc/group" ]; then
-	echo "root::0:" > /system/etc/group
-	$BB chmod 0666 /system/etc/group
+if [ ! -f "/etc/passwd" ]; then
+	echo "root::0:0:root:/data/local:/sbin/sh" > /etc/passwd
+	$BB chmod 0400 /etc/passwd
+fi
+
+if [ ! -f "/etc/group" ]; then
+	echo "root::0:" > /etc/group
+	$BB chmod 0400 /etc/group
 fi
 
 $BB mount -o remount,ro /
