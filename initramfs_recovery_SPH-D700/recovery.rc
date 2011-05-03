@@ -19,7 +19,7 @@ on init
 	symlink /mnt/sdcard /sdcard
 	symlink /mnt/sd-ext /sd-ext
 
-	mount tmpfs tmpfs /tmp size=4m
+	mount tmpfs nodev /tmp
 
 	insmod /lib/modules/logger.ko
 	insmod /lib/modules/fsr.ko
@@ -30,7 +30,6 @@ on init
 	insmod /lib/modules/dpram_recovery.ko
 	insmod /lib/modules/param.ko 
 
-
 ###################################################################
 # mount mtd partitions begin
 
@@ -39,23 +38,20 @@ on init
 	mount j4fs /dev/block/stl6 /mnt/.lfs
 
 # /system
-	mkdir /system 0775 system system
-	mount ext4 /dev/block/stl9 /system noatime nodiratime errors=continue nobh data=writeback barrier=0 discard noauto_da_alloc
-	mount rfs /dev/block/stl9 /system nosuid nodev check=no
+	mount ext4 /dev/block/stl9 /system noatime nodiratime errors=continue nobh data=writeback barrier=0 discard noauto_da_alloc check=none
+	mount rfs /dev/block/stl9 /system nosuid nodev check=none
 	chown root system /system
 	chmod 0775 /system
 
 # /data
-	mkdir /data 0771 system system
-	mount ext4 /dev/block/stl10 /data nosuid nodev noatime nodiratime errors=continue nobh data=writeback barrier=0 discard noauto_da_alloc
-	mount rfs /dev/block/stl10 /data nosuid nodev check=no
+	mount ext4 /dev/block/stl10 /data nosuid nodev noatime nodiratime errors=continue nobh data=writeback barrier=0 discard noauto_da_alloc check=none
+	mount rfs /dev/block/stl10 /data nosuid nodev check=none
 	chown system system /data
 	chmod 0771 /data
 
 # /cache
-	mkdir /cache 0770 system cache
-	mount ext4 /dev/block/stl11 /cache nosuid nodev noatime nodiratime errors=continue nobh data=writeback barrier=0 discard noauto_da_alloc
-	mount rfs /dev/block/stl11 /cache nosuid nodev check=no
+	mount ext4 /dev/block/stl11 /cache nosuid nodev noatime nodiratime errors=continue nobh data=writeback barrier=0 discard noauto_da_alloc check=none
+	mount rfs /dev/block/stl11 /cache nosuid nodev check=none
 	chown system cache /cache
 	chmod 0770 /cache
 	chown system cache /cache/recovery
@@ -63,7 +59,7 @@ on init
 
 # /efs
 	mkdir /efs 0771
-	mount rfs /dev/block/stl3 /efs nosuid nodev check=no
+	mount rfs /dev/block/stl3 /efs nosuid nodev check=none
 	chown radio radio /efs
 	chmod 0771 /efs
 
@@ -72,7 +68,6 @@ on init
 
 
 on boot
-
 	ifup lo
 	hostname localhost
 	domainname localdomain
@@ -82,15 +77,16 @@ service init_local /sbin/init_wrapper
 	user root
 	oneshot
 
-## Daemon processes to be run by init.
+## Daemon processes to be run by init
+
+service recovery /sbin/recovery
+
+service adbd /sbin/adbd recovery
+	disabled
 
 on property:persist.service.adb.enable=1
 	start adbd
 
 on property:persist.service.adb.enable=0
 	stop adbd
-
-service recovery /sbin/recovery
-
-service adbd /sbin/adbd recovery
 
