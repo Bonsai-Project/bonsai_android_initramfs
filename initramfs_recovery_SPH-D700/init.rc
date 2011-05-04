@@ -451,9 +451,9 @@ service console /system/bin/sh
 	group shell system log
 	console
 
-service init_local /sbin/init_wrapper
-    user root
-    oneshot
+#service init_local /sbin/init_wrapper
+#    user root
+#    oneshot
 
 service playlogos1 /system/bin/playlogos1
 	user root
