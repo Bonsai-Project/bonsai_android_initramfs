@@ -61,7 +61,7 @@ loglevel 1
 	mkdir /sqlite_stmt_journals 01777 root root
 	mount tmpfs tmpfs /sqlite_stmt_journals size=4m
 	mkdir /tmp 1777 root root
-	mount tmpfs tmpfs /tmp size=4m
+	mount tmpfs tmpfs /tmp
 
 # directory for putting things only root should see.
 	mkdir /mnt/secure 0700 root root
