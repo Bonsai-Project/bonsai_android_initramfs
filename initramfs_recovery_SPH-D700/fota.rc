@@ -7,6 +7,21 @@ on init
 
 	symlink /res/etc /etc
 
+# Create BML devices
+	mknod /dev/block/bml0!c b 137 0
+	mknod /dev/block/bml1 b 137 1
+	mknod /dev/block/bml2 b 137 2
+	mknod /dev/block/bml3 b 137 3
+	mknod /dev/block/bml4 b 137 4
+	mknod /dev/block/bml5 b 137 5
+	mknod /dev/block/bml6 b 137 6
+	mknod /dev/block/bml7 b 137 7
+	mknod /dev/block/bml8 b 137 8
+	mknod /dev/block/bml9 b 137 9
+	mknod /dev/block/bml10 b 137 10
+	mknod /dev/block/bml11 b 137 11
+	mknod /dev/block/bml12 b 137 12
+
 # create mountpoints
 	mkdir /data 0771 system system
 	mkdir /cache 0770 system cache
@@ -53,7 +68,7 @@ on init
 
 # /system
 	mount ext4 /dev/block/stl9 /system noatime nodiratime errors=continue nobh data=writeback barrier=0 discard noauto_da_alloc check=none
-	mount rfs /dev/block/stl9 /system nosuid nodev check=none
+	mount rfs /dev/block/stl9 /system check=none
 	chown root system /system
 	chmod 0775 /system
 
@@ -67,20 +82,16 @@ on boot
 	domainname localdomain
 	class_start default
 
-#service init_local /sbin/init_wrapper
-#	user root
-#	oneshot
-
 ## Daemon processes to be run by init
-
-service adbd /sbin/adbd
-	disabled
 
 on property:persist.service.adb.enable=1
 	start adbd
 
 on property:persist.service.adb.enable=0
 	stop adbd
+
+service adbd /sbin/adbd recovery
+	disabled
 
 service recovery /sbin/recovery
 	oneshot

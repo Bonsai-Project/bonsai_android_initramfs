@@ -8,4 +8,3 @@ tmpfs /tmp tmpfs rw,relatime,size=4096k 0 0
 /dev/block/stl10 /data ext4 rw,nosuid,nodev,noatime,nodiratime,barrier=0,data=writeback,noauto_da_alloc 0 0
 /dev/block/stl11 /cache ext4 rw,nosuid,nodev,noatime,nodiratime,barrier=0,data=writeback,noauto_da_alloc 0 0
 /dev/block/mmcblk0p1 /mnt/sdcard vfat rw,nodev,noatime,nodiratime,errors=continue 0 0
-/dev/block/mmcblk0p2 /mnt/sd-ext ext2 rw,nodev,nobh,nouser_xattr,noatime,nodiratime,check=none,errors=continue 0 0

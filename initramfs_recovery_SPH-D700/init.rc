@@ -6,7 +6,7 @@ loglevel 1
 
 # Bonsai v4
 # setup the global environment
-	export PATH /system/xbin:/system/bin:/sbin
+	export PATH /system/bin:/system/xbin:/sbin
 	export LD_LIBRARY_PATH /system/lib:/system/lib/egl
 	export ANDROID_BOOTLOGO 1
 	export ANDROID_ROOT /system
@@ -47,11 +47,10 @@ loglevel 1
 
 # create mount points
 	mkdir /data 0771 system system
-	mkdir /efs 0771 system system
+	mkdir /efs 0771 radio radio
 	mkdir /cache 0770 system cache
 	mkdir /config 0500 root root
 	mkdir /system 0775 system system
-	mkdir /mnt 0775 root system
 	mkdir /mnt/sd-ext 0775 system system
 	mkdir /mnt/sdcard 0775 system system
 
@@ -60,7 +59,7 @@ loglevel 1
 
 	mkdir /sqlite_stmt_journals 01777 root root
 	mount tmpfs tmpfs /sqlite_stmt_journals size=4m
-	mkdir /tmp 1777 root root
+	mkdir /tmp 01777 root root
 	mount tmpfs tmpfs /tmp
 
 # directory for putting things only root should see.
@@ -108,16 +107,19 @@ loglevel 1
 
 # /system
 	mount ext4 /dev/block/stl9 /system rw noatime nodiratime errors=continue nobh data=writeback barrier=0 discard noauto_da_alloc
+	mount rfs /dev/block/stl9 /system ro check=none
 	chown root system /system
 	chmod 0775 /system
 
 # /data
 	mount ext4 /dev/block/stl10 /data rw nosuid nodev noatime nodiratime errors=continue nobh data=writeback barrier=0 discard noauto_da_alloc
+	mount rfs /dev/block/stl10 /data nosuid nodev check=none
 	chown system system /data
 	chmod 0771 /data
 
 # /cache
 	mount ext4 /dev/block/stl11 /cache rw nosuid nodev noatime nodiratime errors=continue nobh data=writeback barrier=0 discard noauto_da_alloc
+	mount rfs /dev/block/stl11 /cache nosuid nodev check=none
 	chown system cache /cache
 	chmod 0770 /cache
 	chown system cache /cache/recovery
@@ -125,11 +127,6 @@ loglevel 1
 
 # /efs
 	mount rfs /dev/block/stl3 /efs nosuid nodev check=none
-	chown radio radio /efs
-	chmod 0771 /efs
-
-# /sd-ext
-	mount ext2 /dev/block/mmcblk0p2 /mnt/sd-ext rw defaults nodev nobh nouser_xattr noatime nodiratime errors=continue check=none
 	chown radio radio /efs
 	chmod 0771 /efs
 
@@ -156,36 +153,77 @@ loglevel 1
 	chmod 0440 /proc/vmallocinfo
 
 # create data/gps for GPS demon
-	mkdir /data/gps 0775 system system
+	mkdir /data/gps 0771 system system
 	chmod 600 /data/gps/secgps.conf
 
 # create basic filesystem structure
-	mkdir /data/misc 0771 system misc
+	mkdir /data/misc 01771 system misc
+	chown system misc /data/misc
+	chmod 01771 /data/misc
 	mkdir /data/misc/hcid 0770 bluetooth bluetooth
+	chown bluetooth bluetooth /data/misc/hcid
+	chmod 0770 /data/misc/hcid
 	mkdir /data/misc/bluetooth 0777 bluetooth bluetooth
+	chown bluetooth bluetooth /data/misc/bluetooth
+	chmod 0777 /data/misc/bluetooth
 	mkdir /data/misc/keystore 0700 keystore keystore
+	chown keystore keystore /data/misc/keystore
+	chmod 0700 /data/misc/keystore
 	mkdir /data/misc/vpn 0770 system system
+	chown system system /data/misc/vpn
+	chmod 0770 /data/misc/vpn
 	mkdir /data/misc/systemkeys 0700 system system
+	chown system system /data/misc/systemkeys
+	chmod 0700 /data/misc/systemkeys
 	mkdir /data/misc/vpn/profiles 0770 system system
+	chown system system /data/misc/vpn/profiles
+	chmod 0770 /data/misc/vpn/profiles
 	mkdir /data/misc/radio 0771 radio radio
+	chown radio radio /data/misc/radio
+	chmod 0771 /data/misc/radio
 
 # to enable wifi
 	mkdir /data/wifi 0777 wifi wifi
+	chown wifi wifi /data/wifi
+	chmod 0777 /data/wifi
 	mkdir /data/misc/wifi 0777 wifi wifi
+	chown wifi wifi /data/misc/wifi
+	chmod 0777 /data/misc/wifi
 	mkdir /data/misc/dhcp 0777 dhcp dhcp
+	chown dhcp dhcp /data/misc/dhcp
+	chmod 0777 /data/misc/dhcp
 	mkdir /data/misc/wifi/sockets 0777 wifi wifi
+	chown wifi wifi /data/misc/wifi/sockets
+	chmod 0777 /data/misc/wifi/sockets
 	chmod 0664 /system/etc/wifi/wpa_supplicant.conf
 
 # user local filesystems
 	mkdir /data/local 0771 shell shell
+	chown shell shell /data/local
+	chmod 0771 /data/local
 	mkdir /data/local/tmp 0771 shell shell
+	chown shell shell /data/local/tmp
+	chmod 0771 /data/local/tmp
 	mkdir /data/data 0771 system system
+	chown system system /data/data
+	chmod 0771 /data/data
 	mkdir /data/app-private 0771 system system
+	chown system system /data/app-private
+	chmod 0771 /data/app-private
 	mkdir /data/app 0771 system system
+	chown system system /data/app
+	chmod 0771 /data/app
 	mkdir /data/property 0700 root root
+	chown root root /data/property
+	chmod 0700 /data/property
 
 # create log system 
 	mkdir /data/log 0777 root root
+	chown root root /data/log
+	chmod 0777 /data/log
+	mkdir /data/anr 0777 system system
+	chown system system /data/anr
+	chmod 0777 /data/anr
 	chmod 0662 /dev/log/radio
 	chmod 0662 /dev/log/main
 	chmod 0662 /dev/log/events
@@ -193,9 +231,13 @@ loglevel 1
 
 # create dump camera
 	mkdir /data/dump 0777 root root 
+	chown root root /data/dump
+	chmod 0777 /data/dump
 
 # create dalvik-cache and double-check the perms
 	mkdir /data/dalvik-cache 0771 system system
+	chown system system /data/dalvik-cache
+	chmod 0771 /data/dalvik-cache
 
 # create the lost+found directories, so as to enforce our permissions
 	mkdir /data/lost+found 0770 root root
@@ -207,19 +249,26 @@ loglevel 1
 
 # DRM directory creation
 	mkdir /system/etc/security/drm 0777 root root
+	chown root root /system/etc/security/drm
+	chmod 0777 /system/etc/security/drm
 	# permission for WMDRM sample.hds file
 	chmod 0777  /system/etc/security/drm/sample.hds
 	chmod 0777  /data/data/.drm/.wmdrm/sample.hds
 	# added for testing WMDRM and DIVX DRM
 	mkdir /data/data/.drm/ 0777
+	chmod 0777 /data/data/.drm
 	mkdir /data/data/.drm/.wmdrm 0777
+	chmod 0777 /data/data/.drm/.wmdrm
 	mkdir /data/data/.drm/.divxdrm 0777
+	chmod 0777 /data/data/.drm/.divxdrm
 
 # video play for m.youtube.com
 	mkdir /data/data/.youtube 0777
+	chmod 0777 /data/data/.youtube
 
 # added for path change for generated certificates and hds file for playready DRM
 	mkdir /data/data/.drm/.playready 0777
+	chmod 0777 /data/data/.drm/.playready
 
 # load modules for 3D
 	insmod /modules/pvrsrvkm.ko
@@ -229,7 +278,6 @@ loglevel 1
 # load modules for FM Radio
 	#insmod /lib/modules/Si4709_driver.ko # loading causes boot loop
 	insmod /lib/modules/vibrator.ko
-	insmod /lib/modules/melfas_touchkey.ko
 
 # all operation with rootfs should be finished here, root partition will mounted read-only . d.moskvitin
 	mount rootfs rootfs / ro remount
@@ -279,6 +327,120 @@ on boot
 # set init its forked children's oom_adj.
 	write /proc/1/oom_adj -16
 
+# permissions 
+	chmod 666 /system/usr/keychars/s3c-keypad.kcm.bin
+	chown radio system /sys/android_power/state
+	chown radio system /sys/android_power/request_state
+	chown radio system /sys/android_power/acquire_full_wake_lock
+	chown radio system /sys/android_power/acquire_partial_wake_lock
+	chown radio system /sys/android_power/release_wake_lock
+	chown radio system /sys/power/state
+	chown radio system /sys/power/wake_lock
+	chown radio system /sys/power/wake_unlock
+	chown radio system /sys/power/dvfslock_ctrl
+	chmod 0660 /sys/power/state
+	chmod 0660 /sys/power/wake_lock
+	chmod 0660 /sys/power/wake_unlock
+	chmod 0660 /sys/power/dvfslock_ctrl
+	chown system system /sys/class/timed_output/vibrator/enable
+	chmod 0777 /sys/class/timed_output/vibrator/enable
+	chown system system /sys/class/leds/keyboard-backlight/brightness
+	chown system system /sys/class/leds/lcd-backlight/brightness
+	chown system system /sys/class/leds/button-backlight/brightness
+	chown system system /sys/class/leds/jogball-backlight/brightness
+	chown system system /sys/class/leds/red/brightness
+	#chown system system /sys/class/leds/green/brightness
+	chown system system /sys/class/leds/blue/brightness
+	chown system system /sys/class/leds/red/trigger
+	chown system system /sys/class/leds/blue/trigger
+	chown system system /sys/class/leds/red/delay_on
+	chown system system /sys/class/leds/red/delay_off
+	chown system system /sys/class/leds/blue/delay_on
+	chown system system /sys/class/leds/blue/delay_off
+	#chown system system /sys/class/leds/red/device/grpfreq
+	#chown system system /sys/class/leds/red/device/grppwm
+	#chown system system /sys/class/leds/red/device/blink
+	#chown system system /sys/class/leds/red/brightness
+	#chown system system /sys/class/leds/green/brightness
+	#chown system system /sys/class/leds/blue/brightness
+	#chown system system /sys/class/leds/red/device/grpfreq
+	#chown system system /sys/class/leds/red/device/grppwm
+	#chown system system /sys/class/leds/red/device/blink
+	chown system system /sys/module/sco/parameters/disable_esco
+	chown system system /sys/kernel/ipv4/tcp_wmem_min
+	chown system system /sys/kernel/ipv4/tcp_wmem_def
+	chown system system /sys/kernel/ipv4/tcp_wmem_max
+	chown system system /sys/kernel/ipv4/tcp_rmem_min
+	chown system system /sys/kernel/ipv4/tcp_rmem_def
+	chown system system /sys/kernel/ipv4/tcp_rmem_max
+	chown root radio /proc/cmdline
+	chown system system /sys/devices/platform/s3c-keypad/key_pressed
+	chmod 0777 /sys/devices/platform/s3c-keypad/key_pressed
+
+# for Sensor HAL
+	chown system system /dev/accelerometer
+	chown compass system /dev/accel
+	chown compass system /dev/compass
+	chown system system /dev/akm8973_daemon
+	chown system system /dev/akm8973_aot
+	#chown system system /dev/bma020
+	#chown system system /dev/proximity
+	chown system system /dev/light
+	#chmod 0777 /dev/accelerometer
+	chmod 0777 /dev/akm8973_daemon
+	chmod 0777 /dev/akm8973_aot
+	#chmod 0777 /dev/bma020
+	#chmod 0777 /dev/proximity
+	#chmod 0660 /dev/light
+
+# magnetic sensor yamaha
+	#chown compass system /dev/i2c-12
+	#chown compass system /dev/i2c-5
+	#chown system system /dev/bma020
+	chmod 0777 /dev/akm8973_daemon
+	chmod 0777 /dev/akm8973_aot
+	#chmod 0777 /dev/bma020
+
+# for wimax
+	chown system system /dev/swmxctl
+	chown system system /dev/uwibro
+
+# for sound tuning files
+# audio data read/write permission
+# XXX do these conflict with VooDoo Sound?
+	chmod 0777 /system/etc/audio/aeqcoe.txt
+	chmod 0777 /system/etc/audio/soundbooster.txt
+	chmod 0777 /system/etc/audio/situation.txt
+	chmod 0777 /system/etc/audio/stream_headset.txt
+	chmod 0777 /system/etc/audio/stream_speaker.txt
+	chmod 0777 /system/etc/audio/stream_earpiece.txt
+
+# Sec_Feature_Android sw81.jang
+	setprop audioflinger.btincall 0
+
+
+# bluetooth
+	chown bluetooth bluetooth /sys/module/bluetooth_power/parameters/power
+	chown bluetooth bluetooth /proc/bluetooth/sleep/proto
+	chown system system /sys/module/sco/parameters/disable_esco
+	chmod 0660 /sys/module/bluetooth_power/parameters/power
+	chmod 0660 /proc/bluetooth/sleep/proto
+	chown bluetooth bluetooth /dev/uinput
+	chmod 0660 /dev/uinput
+	chmod 0660 /dev/input/event3
+	chmod 0660 /dev/input/mouse0
+	chmod 0660 /dev/input/event2
+	chmod 0660 /dev/input/event1
+	chmod 0660 /dev/input/mice
+	chmod 0660 /dev/input/event0
+	chown bluetooth bluetooth /dev/s3c2410_serial0
+	chmod 0660 /dev/s3c2410_serial0
+	chmod 0777 /sys/class/rfkill/rfkill0/state
+	chmod 0777 /sys/class/rfkill/rfkill1/state
+	chown bluetooth bluetooth /sys/class/rfkill/rfkill0/state
+	chown bluetooth bluetooth /sys/class/rfkill/rfkill1/state 
+	chmod 6777 /system/bin/brcm_dutMode
+	chmod 0666 /data/misc/bluetooth/dynamic_auto_pairing.conf
 
 	class_start default
 
@@ -289,10 +451,6 @@ service console /system/bin/sh
 	user shell
 	group shell system log
 	console
-
-#service init_local /sbin/init_wrapper
-#    user root
-#    oneshot
 
 service playlogos1 /system/bin/playlogos1
 	user root
@@ -374,6 +532,13 @@ service media /system/bin/mediaserver
 	user media
 	group system audio camera graphics inet net_bt net_bt_admin log
 
+## to prevent lockup issue during poweron/off test, reluctantly putting this back in for now RT
+service killmediaserver /system/bin/killmediaserver
+	user media
+	group system
+	oneshot
+## to prevent lockup issue during poweron/off test
+
 service bootanim /system/bin/bootanimation
 	user graphics
 	group graphics
@@ -412,15 +577,6 @@ service dbus /system/bin/dbus-daemon --system --nofork
 service btld /system/bin/logwrapper /system/bin/btld -hb 3000000 -hp /dev/s3c2410_serial0 -lpm 1
 	# init.rc does not yet support applying capabilities, so run as root and
 	# let btld drop uid to bluetooth with the right linux capabilities
-	group bluetooth net_bt_admin
-	disabled
-	oneshot
-
-# start DTUN OBEXD  -----------------------------------------
-service obexd /system/bin/logwrapper /system/bin/obexd
-	# init.rc does not yet support applying capabilities, so run as root and
-	# let obexd drop uid to bluetooth with the right linux capabilities
-	user root
 	group bluetooth net_bt_admin
 	disabled
 	oneshot
